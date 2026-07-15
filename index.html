@@ -45,11 +45,24 @@
         <span id="buttonText">Start Motion</span>
       </button>
 
+      <div class="flex flex-col gap-4 slider">
+        <span class="text-center">x 1.0</span>
+        <input
+          id="speed-slider"
+          type="range"
+          min="1"
+          max="5"
+          step="0.25"
+          value="1"
+          class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full appearance-none cursor-pointer accent-amber-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+      </div>
+
       <button
         id="reset"
         class="w-full flex items-center justify-center gap-2 bg-white text-slate-950 font-medium text-sm py-2.5 px-4 rounded-md transition-all duration-100 hover:bg-slate-800 hover:text-white shadow-sm cursor-pointer"
       >
-        <span id="buttonIcon" class="w-3 h-3 flex items-center justify-center">
+        <!-- <span id="buttonIcon" class="w-3 h-3 flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -62,13 +75,13 @@
               clip-rule="evenodd"
             />
           </svg>
-        </span>
+        </span> -->
 
-        <span>Reset Globe</span>
+        <span>Reset Camera</span>
       </button>
     </div>
 
     <canvas id="Canvas" class="block w-full h-screen"></canvas>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/init.js"></script>
   </body>
 </html>
