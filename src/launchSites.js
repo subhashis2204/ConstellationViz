@@ -27,4 +27,6 @@ export function launchSitesPlotter(scene, globe) {
     marker.userData = site;
     markersGroup.add(marker);
   });
+
+  return markersGroup;
 }

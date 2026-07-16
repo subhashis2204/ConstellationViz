@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 
 export function controlUI(
+  globe,
   orbitControl,
   camera,
   getMotionStatus,
@@ -42,10 +43,30 @@ export function controlUI(
   });
 
   resetButton.addEventListener("click", () => {
+    // 1. Establish a target identity quaternion (default starting rotation)
+    const target = new THREE.Quaternion();
+    const start = globe.quaternion.clone();
+
+    const state = { t: 0 };
+
+    // Smoothly rotate the globe back to its default starting orientation
+    gsap.to(state, {
+      t: 1,
+      duration: 1.5,
+      ease: "power2.out",
+
+      onUpdate() {
+        globe.quaternion.copy(start).slerp(target, state.t);
+        orbitControl.update(); // Keep the controls updated alongside the rotation change
+      },
+    });
+
+    // 2. Camera zoom & leveling transition
     const defaultZoomDistance = 220;
     const centreOfWorld = new THREE.Vector3(0, 0, 0);
-    const distance = camera.position.distanceTo(centreOfWorld);
     const theta = Math.atan2(camera.position.x, camera.position.z);
+
+    // Calculate reset camera coordinates based on current horizontal angle
     const newX = defaultZoomDistance * Math.sin(theta);
     const newZ = defaultZoomDistance * Math.cos(theta);
 
@@ -59,7 +80,7 @@ export function controlUI(
 
     gsap.to(camera.position, {
       x: newX,
-      y: 0,
+      y: 0, // Level the camera parallel with the equator
       z: newZ,
       duration: 1,
       ease: "power2.out",

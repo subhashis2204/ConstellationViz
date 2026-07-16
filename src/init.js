@@ -4,6 +4,8 @@ import { initScene } from "./initScene.js";
 import { controlUI } from "./controlUI.js";
 import { createStarfield } from "./background.js";
 import { launchSitesPlotter } from "./launchSites.js";
+import { setupHover } from "./hoverInteraction.js";
+import { setupFocusInteraction } from "./focusInteration.js";
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
@@ -20,7 +22,7 @@ const cloudMaterial = new THREE.MeshStandardMaterial({
 });
 
 const cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
-scene.add(cloudMesh);
+globe.add(cloudMesh);
 
 const starField = createStarfield(scene);
 
@@ -41,6 +43,7 @@ const rotationSpeedMultiplier = function (mult) {
 };
 
 controlUI(
+  globe,
   orbitControl,
   camera,
   getMotionStatus,
@@ -48,10 +51,28 @@ controlUI(
   rotationSpeedMultiplier,
 );
 
-launchSitesPlotter(scene, globe);
+const launchSiteGrp = launchSitesPlotter(scene, globe);
+const hover = setupHover(renderer, camera, launchSiteGrp);
+
+let isFocusing = false;
+function setFocusState(state) {
+  isFocusing = state;
+}
+
+setupFocusInteraction(
+  renderer,
+  camera,
+  globe,
+  orbitControl,
+  launchSiteGrp,
+  setFocusState,
+  getMotionStatus,
+);
 
 const ticker = () => {
-  if (activeMotionState) {
+  hover.update();
+
+  if (activeMotionState && !isFocusing) {
     globe.rotation.y += 0.0005 * factor;
 
     cloudMesh.rotation.y += 0.0002 * factor;

@@ -25,8 +25,8 @@ export function initScene() {
 
   const orbitControl = new OrbitControls(camera, canvas);
   orbitControl.enableDamping = true;
-  orbitControl.minPolarAngle = Math.PI / 3;
-  orbitControl.maxPolarAngle = (2 * Math.PI) / 3;
+  // orbitControl.minPolarAngle = Math.PI / 3;
+  // orbitControl.maxPolarAngle = (2 * Math.PI) / 3;
   // orbitControl.autoRotateSpeed = 0.05;
   orbitControl.maxDistance = 400;
 
