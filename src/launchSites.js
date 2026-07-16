@@ -13,7 +13,9 @@ function createMarker() {
 
 export function launchSitesPlotter(scene, globe) {
   const markersGroup = new THREE.Group();
-  scene.add(markersGroup);
+
+  globe.add(markersGroup);
+  // scene.add(markersGroup);
 
   launchSites.forEach((site) => {
     const pos = globe.getCoords(site.lat, site.lng, 0.01);
