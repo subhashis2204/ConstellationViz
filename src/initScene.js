@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import ThreeGlobe from "three-globe";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 export function initScene() {
