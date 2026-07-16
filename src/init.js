@@ -3,7 +3,6 @@ import ThreeGlobe from "three-globe";
 import { initScene } from "./initScene.js";
 import { controlUI } from "./controlUI.js";
 import { createStarfield } from "./background.js";
-import { launchSitesPlotter } from "./launchSites.js";
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
@@ -47,8 +46,6 @@ controlUI(
   updateMotionState,
   rotationSpeedMultiplier,
 );
-
-launchSitesPlotter(scene);
 
 const ticker = () => {
   if (activeMotionState) {
