@@ -13,11 +13,8 @@ export function controlUI(
   const buttonIcon = document.querySelector("#buttonIcon");
   const resetButton = document.querySelector("#reset");
   const sliderInput = document.querySelector(".slider input");
-  const sliderText = document.querySelector(".slider span");
+  const sliderText = document.querySelector(".sim-speed");
   const sliderComponent = document.querySelector(".slider");
-
-  console.log(sliderInput.value);
-  console.log(sliderText.innerHTML);
 
   const playIconHtml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" /></svg>`;
   const pauseIconHtml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Zm7.5 0a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0v-12a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" /></svg>`;
@@ -45,11 +42,12 @@ export function controlUI(
   });
 
   resetButton.addEventListener("click", () => {
+    const defaultZoomDistance = 220;
     const centreOfWorld = new THREE.Vector3(0, 0, 0);
     const distance = camera.position.distanceTo(centreOfWorld);
     const theta = Math.atan2(camera.position.x, camera.position.z);
-    const newX = distance * Math.sin(theta);
-    const newZ = distance * Math.cos(theta);
+    const newX = defaultZoomDistance * Math.sin(theta);
+    const newZ = defaultZoomDistance * Math.cos(theta);
 
     gsap.to(orbitControl.target, {
       x: 0,

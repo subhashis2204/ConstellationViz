@@ -74,6 +74,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // handles high-DP
 // });
 
 // 6. Animation Loop
+
 const ticker = () => {
   if (isMotionActive) {
     cloudMesh.rotation.y += 0.0002;
