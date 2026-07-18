@@ -7,13 +7,13 @@ import { launchSitesPlotter } from "./launchSites.js";
 import { setupHover } from "./hoverInteraction.js";
 import { setupFocusInteraction } from "./focusInteration.js";
 import { rotation } from "./rotation.js";
+import { LaunchStationCard } from "./cardStructure.js";
+import { launchClickListener } from "./clickListener.js";
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
 
-// --- CRITICAL FIX FOR ORBIT CONTROLS ---
-// Disable left-click camera orbiting so it doesn't fight your manual globe drag logic.
-// This allows orbitControl to still manage smooth zooming and panning.
+// Disabled Orbital Rotation - Enabled Quartenions for accuracy
 orbitControl.enableRotate = false;
 
 const globe = new ThreeGlobe().globeImageUrl("./earth.jpg");
@@ -91,6 +91,8 @@ function getDragging() {
 }
 
 rotation(globe, setDragging, getDragging, getFocusState);
+
+launchClickListener(camera, launchSiteGrp);
 
 const axisY = new THREE.Vector3(0, 1, 0);
 const axisX = new THREE.Vector3(1, 0, 0);
