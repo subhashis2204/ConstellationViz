@@ -9,6 +9,7 @@ import { setupFocusInteraction } from "./focusInteration.js";
 import { rotation } from "./rotation.js";
 import { LaunchStationCard } from "./cardStructure.js";
 import { launchClickListener } from "./clickListener.js";
+import { equatorLine } from "./equatorLine.js";
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
@@ -16,8 +17,19 @@ const { scene, camera, renderer, orbitControl } = initScene();
 // Disabled Orbital Rotation - Enabled Quartenions for accuracy
 orbitControl.enableRotate = false;
 
+const globeContainer = new THREE.Group();
+scene.add(globeContainer);
+
 const globe = new ThreeGlobe().globeImageUrl("./earth.jpg");
-scene.add(globe);
+globeContainer.add(globe);
+
+const tilt = new THREE.Quaternion();
+tilt.setFromAxisAngle(
+  new THREE.Vector3(0, 0, 1),
+  THREE.MathUtils.degToRad(-23.44),
+);
+
+globeContainer.quaternion.copy(tilt);
 
 const cloudGeometry = new THREE.SphereGeometry(101, 64, 64);
 const cloudTexture = new THREE.TextureLoader().load("./earth_cloud_lite.jpg");
@@ -93,6 +105,8 @@ function getDragging() {
 rotation(globe, setDragging, getDragging, getFocusState);
 
 launchClickListener(camera, launchSiteGrp);
+const equator = equatorLine();
+globe.add(equator);
 
 const axisY = new THREE.Vector3(0, 1, 0);
 const axisX = new THREE.Vector3(1, 0, 0);
