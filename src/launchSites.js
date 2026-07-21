@@ -6,7 +6,7 @@ function createMarker() {
   return new THREE.Mesh(
     new THREE.SphereGeometry(0.8, 16, 16),
     new THREE.MeshBasicMaterial({
-      color: 0x00ffff,
+      color: 0xfefae0,
     }),
   );
 }

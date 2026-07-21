@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import ThreeGlobe from "three-globe";
+import axios from "axios";
 import { initScene } from "./initScene.js";
 import { controlUI } from "./controlUI.js";
 import { createStarfield } from "./background.js";
@@ -10,6 +11,11 @@ import { rotation } from "./rotation.js";
 import { LaunchStationCard } from "./cardStructure.js";
 import { launchClickListener } from "./clickListener.js";
 import { equatorLine } from "./equatorLine.js";
+import {
+  plotSatellites,
+  parseTLEData,
+  updateSatellites, // <--- Import updateSatellites
+} from "./satelliteLoader.js";
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
@@ -108,6 +114,63 @@ launchClickListener(camera, launchSiteGrp);
 const equator = equatorLine();
 globe.add(equator);
 
+// -----------------------------------------------------------------
+
+const pathlist = [
+  { category: "ONEWEB", path: "./oneweb.txt", color: "#ffc8dd" },
+  {
+    category: "GEOSAT",
+    path: "./communication_satellites.txt",
+    // limit: 500,
+    color: "#caf0f8",
+  },
+  // {
+  //   category: "STARLINK",
+  //   path: "./starlink.txt",
+  //   // limit: 500,
+  //   color: "#57ffa5",
+  // },
+];
+
+async function satelliteDataLoader(pathlist) {
+  const fullData = {};
+
+  await Promise.all(
+    pathlist.map(async ({ category, path, limit, color }) => {
+      const { data } = await axios.get(path, {
+        responseType: "text",
+      });
+
+      let parsedData = parseTLEData(data);
+
+      if (limit) {
+        parsedData = parsedData.slice(0, limit);
+      }
+
+      fullData[category] = parsedData.map((row) => {
+        return {
+          ...row,
+          color,
+        };
+      });
+    }),
+  );
+
+  return fullData;
+}
+
+const satellites = await satelliteDataLoader(pathlist);
+const fullData = [];
+
+Object.keys(satellites).map((category) => {
+  const datapoints = satellites[category];
+  fullData.push(...datapoints);
+});
+
+plotSatellites(globe, fullData);
+
+// --------------------------------------------------------------------
+
 const axisY = new THREE.Vector3(0, 1, 0);
 const axisX = new THREE.Vector3(1, 0, 0);
 
@@ -118,22 +181,27 @@ const qy = new THREE.Quaternion();
 const autoRotationQ = new THREE.Quaternion();
 const cloudDriftQ = new THREE.Quaternion();
 
+const clock = new THREE.Clock();
+
 const ticker = () => {
   hover.update();
 
-  // Handle auto-rotation updates
+  const delta = clock.getDelta(); // Frame time in seconds (~0.016s)
+
+  // Pass factor so satellite movement scales with your control UI!
+  // if (activeMotionState && !isDragging) updateSatellites(globe, factor, delta);
+  // else updateSatellites(globe, 0, delta);
+
+  // Core Globe Spin
   if (activeMotionState && !isFocusing && !isDragging) {
-    // 1. Core Globe Spin on Y-axis
     autoRotationQ.setFromAxisAngle(axisY, 0.0005 * factor);
     globe.quaternion.multiply(autoRotationQ);
 
-    // 2. Cloud Drift Relative To Earth Parent
-    // Firing a slight incremental offset keeps the atmosphere alive without spiraling out of control
     cloudDriftQ.setFromAxisAngle(axisY, 0.0001 * factor);
     cloudMesh.quaternion.multiply(cloudDriftQ);
   }
 
-  orbitControl.update(); // Keeps damping updates running smoothly
+  orbitControl.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(ticker);
 };

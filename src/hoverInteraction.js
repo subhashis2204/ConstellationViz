@@ -21,12 +21,12 @@ export function setupHover(renderer, camera, markersGroup) {
 
       if (marker !== hoveredMarker) {
         if (hoveredMarker) {
-          hoveredMarker.material.color.set(0x00ffff);
+          hoveredMarker.material.color.set(0xfefae0);
           hoveredMarker.scale.set(1, 1, 1);
         }
 
         marker.material.color.set(0xffcc00);
-        marker.scale.set(1.4, 1.4, 1.4);
+        marker.scale.set(1.5, 1.5, 1.5);
 
         hoveredMarker = marker;
       }
@@ -34,7 +34,7 @@ export function setupHover(renderer, camera, markersGroup) {
       renderer.domElement.style.cursor = "pointer";
     } else {
       if (hoveredMarker) {
-        hoveredMarker.material.color.set(0x00ffff);
+        hoveredMarker.material.color.set(0xfefae0);
         hoveredMarker.scale.set(1, 1, 1);
         hoveredMarker = null;
       }

@@ -29,7 +29,7 @@ export function initScene() {
   // orbitControl.minPolarAngle = Math.PI / 3;
   // orbitControl.maxPolarAngle = (2 * Math.PI) / 3;
   // orbitControl.autoRotateSpeed = 0.05;
-  orbitControl.maxDistance = 400;
+  // orbitControl.maxDistance = 400;
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
