@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import ThreeGlobe from "three-globe";
 import axios from "axios";
-import { initScene } from "./initScene.js";
+import { initScene, getCameraAltitudeKm } from "./initScene.js";
 import { controlUI } from "./controlUI.js";
 import { createStarfield } from "./background.js";
 import { launchSitesPlotter } from "./launchSites.js";
@@ -11,7 +11,9 @@ import { rotation } from "./rotation.js";
 import { LaunchStationCard } from "./cardStructure.js";
 import { launchClickListener } from "./clickListener.js";
 import { equatorLine } from "./equatorLine.js";
+import { setupSatelliteHover } from "./satelliteHover.js";
 import {
+  liveSatelliteDataset,
   plotSatellites,
   parseTLEData,
   updateSatellites, // <--- Import updateSatellites
@@ -19,6 +21,7 @@ import {
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
+console.log(camera.position.z);
 
 // Disabled Orbital Rotation - Enabled Quartenions for accuracy
 orbitControl.enableRotate = false;
@@ -35,7 +38,7 @@ tilt.setFromAxisAngle(
   THREE.MathUtils.degToRad(-23.44),
 );
 
-globeContainer.quaternion.copy(tilt);
+// globeContainer.quaternion.copy(tilt);
 
 const cloudGeometry = new THREE.SphereGeometry(101, 64, 64);
 const cloudTexture = new THREE.TextureLoader().load("./earth_cloud_lite.jpg");
@@ -114,61 +117,89 @@ launchClickListener(camera, launchSiteGrp);
 const equator = equatorLine();
 globe.add(equator);
 
+let datasetLabel = null;
+const datasetSelect = document.querySelector("#dataset-select");
+const datasetColor = document.querySelector("#color-picker");
+const datasetSatelliteCount = document.querySelector("#sat-count-display");
+
+const cameraAlt = document.querySelector("#camera-alt");
+
 // -----------------------------------------------------------------
 
 const pathlist = [
   { category: "ONEWEB", path: "./oneweb.txt", color: "#ffc8dd" },
-  {
-    category: "GEOSAT",
-    path: "./communication_satellites.txt",
-    // limit: 500,
-    color: "#caf0f8",
-  },
+  // {
+  //   category: "GEOSAT",
+  //   path: "./communication_satellites.txt",
+  //   // limit: 500,
+  //   color: "#caf0f8",
+  // },
   // {
   //   category: "STARLINK",
-  //   path: "./starlink.txt",
-  //   // limit: 500,
+  //   path: "./satellite.txt",
+  //   limit: 500,
   //   color: "#57ffa5",
   // },
 ];
 
-async function satelliteDataLoader(pathlist) {
+// async function satelliteDataLoader(pathlist) {
+//   const fullData = {};
+
+//   await Promise.all(
+//     pathlist.map(async ({ category, path, limit, color }) => {
+//       const { data } = await axios.get(path, {
+//         responseType: "text",
+//       });
+
+//       let parsedData = parseTLEData(data);
+
+//       if (limit) {
+//         parsedData = parsedData.slice(0, limit);
+//       }
+
+//       fullData[category] = parsedData.map((row) => {
+//         return {
+//           ...row,
+//           color,
+//         };
+//       });
+//     }),
+//   );
+
+//   return fullData;
+// }
+
+async function satelliteDataLoader(datasetLabel) {
   const fullData = {};
+  let dataset = await liveSatelliteDataset(datasetLabel);
 
-  await Promise.all(
-    pathlist.map(async ({ category, path, limit, color }) => {
-      const { data } = await axios.get(path, {
-        responseType: "text",
-      });
-
-      let parsedData = parseTLEData(data);
-
-      if (limit) {
-        parsedData = parsedData.slice(0, limit);
-      }
-
-      fullData[category] = parsedData.map((row) => {
-        return {
-          ...row,
-          color,
-        };
-      });
-    }),
-  );
-
-  return fullData;
+  return dataset.map((row) => {
+    return {
+      ...row,
+      color: datasetColor.value,
+    };
+  });
 }
 
-const satellites = await satelliteDataLoader(pathlist);
-const fullData = [];
+datasetSelect.addEventListener("change", async (event) => {
+  datasetLabel = event.target.value;
 
-Object.keys(satellites).map((category) => {
-  const datapoints = satellites[category];
-  fullData.push(...datapoints);
+  const dataset = await satelliteDataLoader(datasetLabel);
+  datasetSatelliteCount.innerHTML = dataset.length;
+  plotSatellites(globe, dataset);
 });
 
-plotSatellites(globe, fullData);
+// const satellites = null; // await satelliteDataLoader(datasetLabel);
+// const fullData = [];
 
+// Object.keys(satellites).map((category) => {
+//   const datapoints = satellites[category];
+//   fullData.push(...datapoints);
+// });
+
+// plotSatellites(globe, fullData);
+
+const updateSatHover = setupSatelliteHover(globe, camera, renderer);
 // --------------------------------------------------------------------
 
 const axisY = new THREE.Vector3(0, 1, 0);
@@ -183,17 +214,36 @@ const cloudDriftQ = new THREE.Quaternion();
 
 const clock = new THREE.Clock();
 
+let altitude = getCameraAltitudeKm(camera);
+cameraAlt.innerHTML = getCameraAltitudeKm(camera);
+
 const ticker = () => {
   hover.update();
+
+  const globeSpinToggle = document.querySelector("#toggle-spin");
+
+  if (altitude !== getCameraAltitudeKm(camera)) {
+    altitude = getCameraAltitudeKm(camera);
+    cameraAlt.innerHTML = altitude;
+    console.log("test");
+  }
 
   const delta = clock.getDelta(); // Frame time in seconds (~0.016s)
 
   // Pass factor so satellite movement scales with your control UI!
-  // if (activeMotionState && !isDragging) updateSatellites(globe, factor, delta);
-  // else updateSatellites(globe, 0, delta);
+  if (activeMotionState && !isDragging) updateSatellites(globe, factor, delta);
+  else updateSatellites(globe, 0, delta);
+
+  // Update satellite hover check on every frame
+  updateSatHover();
 
   // Core Globe Spin
-  if (activeMotionState && !isFocusing && !isDragging) {
+  if (
+    globeSpinToggle.checked &&
+    activeMotionState &&
+    !isFocusing &&
+    !isDragging
+  ) {
     autoRotationQ.setFromAxisAngle(axisY, 0.0005 * factor);
     globe.quaternion.multiply(autoRotationQ);
 

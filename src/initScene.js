@@ -2,6 +2,24 @@ import * as THREE from "three";
 import ThreeGlobe from "three-globe";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+export function getCameraAltitudeKm(camera) {
+  // 1. Calculate vector distance from origin (0,0,0)
+  const cameraDistance = camera.position.length();
+
+  // 2. Globe Earth radius is 100 units
+  const earthRadiusUnits = 100;
+  const realEarthRadiusKm = 6371;
+
+  // 3. Normalized altitude above surface (in globe units)
+  const altUnits = cameraDistance - earthRadiusUnits;
+
+  // 4. Convert globe units to real-world kilometers
+  const altitudeKm = altUnits * (realEarthRadiusKm / earthRadiusUnits);
+
+  // Return altitude rounded to nearest integer (clamped to 0 if inside earth)
+  return Math.max(0, Math.round(altitudeKm));
+}
+
 export function initScene() {
   const canvas = document.querySelector("#Canvas");
   const scene = new THREE.Scene();
@@ -29,7 +47,7 @@ export function initScene() {
   // orbitControl.minPolarAngle = Math.PI / 3;
   // orbitControl.maxPolarAngle = (2 * Math.PI) / 3;
   // orbitControl.autoRotateSpeed = 0.05;
-  // orbitControl.maxDistance = 400;
+  orbitControl.maxDistance = 800;
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
