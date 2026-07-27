@@ -29,7 +29,9 @@ orbitControl.enableRotate = false;
 const globeContainer = new THREE.Group();
 scene.add(globeContainer);
 
-const globe = new ThreeGlobe().globeImageUrl("./earth.jpg");
+const globe = new ThreeGlobe().globeImageUrl(
+  `${import.meta.env.BASE_URL}assets/earth.jpg`,
+);
 globeContainer.add(globe);
 
 const tilt = new THREE.Quaternion();
@@ -41,7 +43,9 @@ tilt.setFromAxisAngle(
 // globeContainer.quaternion.copy(tilt);
 
 const cloudGeometry = new THREE.SphereGeometry(101, 64, 64);
-const cloudTexture = new THREE.TextureLoader().load("./earth_cloud_lite.jpg");
+const cloudTexture = new THREE.TextureLoader().load(
+  `${import.meta.env.BASE_URL}assets/earth_cloud_lite.jpg`,
+);
 const cloudMaterial = new THREE.MeshStandardMaterial({
   map: cloudTexture,
   transparent: true,
