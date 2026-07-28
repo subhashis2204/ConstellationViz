@@ -188,8 +188,9 @@ async function satelliteDataLoader(datasetLabel) {
 datasetSelect.addEventListener("change", async (event) => {
   datasetLabel = event.target.value;
 
+  datasetSatelliteCount.innerHTML = "Loading ...";
   const dataset = await satelliteDataLoader(datasetLabel);
-  datasetSatelliteCount.innerHTML = dataset.length;
+  datasetSatelliteCount.innerHTML = dataset.length || "--";
   plotSatellites(globe, dataset);
 });
 
