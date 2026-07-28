@@ -1,6 +1,7 @@
 // satelliteHover.js
 import * as THREE from "three";
 import * as satellite from "satellite.js";
+import prettyMilliseconds from "pretty-ms";
 
 const EARTH_RADIUS_KM = 6378.137;
 
@@ -19,7 +20,10 @@ export function getTelemetryData(satrec, date = new Date()) {
   const speedKmS = Math.sqrt(
     velocityEci.x ** 2 + velocityEci.y ** 2 + velocityEci.z ** 2,
   );
+
   const periodMinutes = (2 * Math.PI) / satrec.no;
+  const periodMs = Math.round(periodMinutes * 60 * 1000); // Converted to milliseconds
+
   const inclinationDeg = satrec.inclo * (180 / Math.PI);
 
   return {
@@ -31,6 +35,7 @@ export function getTelemetryData(satrec, date = new Date()) {
     speedKmS: speedKmS.toFixed(2),
     speedKmH: Math.round(speedKmS * 3600).toLocaleString(),
     periodMinutes: periodMinutes.toFixed(1),
+    periodSec: prettyMilliseconds(periodMs, { secondsDecimalDigits: 0 }),
     inclinationDeg: inclinationDeg.toFixed(1),
     eccentricity: satrec.ecco.toFixed(5),
   };
@@ -45,7 +50,7 @@ function updateTooltip(sat) {
   tooltipAlt.textContent = `${sat.altitudeKm} km`;
   tooltipSpeed.textContent = `${sat.speedKmS} km/s`;
   tooltipInc.textContent = `${sat.inclinationDeg}°`;
-  tooltipPeriod.textContent = `${sat.periodMinutes} min`;
+  tooltipPeriod.textContent = `${sat.periodSec}`;
 }
 
 export function setupSatelliteHover(globe, camera, renderer) {

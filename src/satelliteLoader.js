@@ -2,6 +2,7 @@
 import * as satellite from "satellite.js";
 import * as THREE from "three";
 import axios from "axios";
+import "humanize-duration";
 
 export async function liveSatelliteDataset(satelliteLabel) {
   if (satelliteLabel == "none") return [];
