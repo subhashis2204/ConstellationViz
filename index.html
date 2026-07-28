@@ -415,12 +415,39 @@
     >
       <span id="launch-tooltip-name" class="font-bold text-amber-300"></span>
     </div>
-
     <div
       id="sat-tooltip"
-      class="fixed hidden pointer-events-none z-50 bg-slate-950/80 backdrop-blur-md border border-cyan-400/40 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg font-sans tracking-wide transform -translate-x-1/2 -translate-y-full mb-2"
+      class="fixed hidden pointer-events-none z-50 bg-slate-950/80 backdrop-blur-md border border-cyan-400/40 text-white text-xs p-3.5 rounded-xl shadow-2xl font-sans tracking-wide transform -translate-x-1/2 -translate-y-full mb-3 min-w-[200px]"
     >
-      <span id="sat-tooltip-name" class="font-bold text-cyan-300"></span>
+      <div
+        class="flex items-center justify-between border-b border-white/10 pb-2 mb-2"
+      >
+        <span id="tooltip-name" class="font-bold text-cyan-300 text-sm"
+          >--</span
+        >
+      </div>
+
+      <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
+        <span class="text-white/50">Altitude:</span>
+        <span id="tooltip-alt" class="font-semibold text-right text-white"
+          >-- km</span
+        >
+
+        <span class="text-white/50">Speed:</span>
+        <span id="tooltip-speed" class="font-semibold text-right text-white"
+          >-- km/s</span
+        >
+
+        <span class="text-white/50">Inclination:</span>
+        <span id="tooltip-inc" class="font-semibold text-right text-white"
+          >--°</span
+        >
+
+        <span class="text-white/50">Period:</span>
+        <span id="tooltip-period" class="font-semibold text-right text-white"
+          >-- min</span
+        >
+      </div>
     </div>
     <canvas id="Canvas" class="block w-full h-screen"></canvas>
     <script type="module" src="./src/index.js"></script>

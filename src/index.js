@@ -193,16 +193,6 @@ datasetSelect.addEventListener("change", async (event) => {
   plotSatellites(globe, dataset);
 });
 
-// const satellites = null; // await satelliteDataLoader(datasetLabel);
-// const fullData = [];
-
-// Object.keys(satellites).map((category) => {
-//   const datapoints = satellites[category];
-//   fullData.push(...datapoints);
-// });
-
-// plotSatellites(globe, fullData);
-
 const updateSatHover = setupSatelliteHover(globe, camera, renderer);
 // --------------------------------------------------------------------
 

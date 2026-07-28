@@ -1,12 +1,59 @@
 // satelliteHover.js
 import * as THREE from "three";
+import * as satellite from "satellite.js";
+
+const EARTH_RADIUS_KM = 6378.137;
+
+export function getTelemetryData(satrec, date = new Date()) {
+  const positionAndVelocity = satellite.propagate(satrec, date);
+  const positionEci = positionAndVelocity.position;
+  const velocityEci = positionAndVelocity.velocity;
+
+  if (!positionEci || !velocityEci) return null;
+
+  // 1. Geodetic Coordinates (Lat, Lng, Height)
+  const gmst = satellite.gstime(date);
+  const positionGd = satellite.eciToGeodetic(positionEci, gmst);
+
+  // 2. Calculated Metrics
+  const speedKmS = Math.sqrt(
+    velocityEci.x ** 2 + velocityEci.y ** 2 + velocityEci.z ** 2,
+  );
+  const periodMinutes = (2 * Math.PI) / satrec.no;
+  const inclinationDeg = satrec.inclo * (180 / Math.PI);
+
+  return {
+    latitude: satellite.degreesLat(positionGd.latitude).toFixed(2),
+    longitude: satellite.degreesLong(positionGd.longitude).toFixed(2),
+    altitudeKm: positionGd.height.toFixed(1),
+    apogeeKm: (satrec.alta * EARTH_RADIUS_KM).toFixed(1),
+    perigeeKm: (satrec.altp * EARTH_RADIUS_KM).toFixed(1),
+    speedKmS: speedKmS.toFixed(2),
+    speedKmH: Math.round(speedKmS * 3600).toLocaleString(),
+    periodMinutes: periodMinutes.toFixed(1),
+    inclinationDeg: inclinationDeg.toFixed(1),
+    eccentricity: satrec.ecco.toFixed(5),
+  };
+}
+
+function updateTooltip(sat) {
+  const tooltipAlt = document.getElementById("tooltip-alt");
+  const tooltipSpeed = document.getElementById("tooltip-speed");
+  const tooltipInc = document.getElementById("tooltip-inc");
+  const tooltipPeriod = document.getElementById("tooltip-period");
+
+  tooltipAlt.textContent = `${sat.altitudeKm} km`;
+  tooltipSpeed.textContent = `${sat.speedKmS} km/s`;
+  tooltipInc.textContent = `${sat.inclinationDeg}°`;
+  tooltipPeriod.textContent = `${sat.periodMinutes} min`;
+}
 
 export function setupSatelliteHover(globe, camera, renderer) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
   const tooltip = document.getElementById("sat-tooltip");
-  const tooltipName = document.getElementById("sat-tooltip-name");
+  const tooltipName = document.getElementById("tooltip-name");
 
   let hoveredMesh = null;
   const originalColor = new THREE.Color();
@@ -58,6 +105,9 @@ export function setupSatelliteHover(globe, camera, renderer) {
 
         if (tooltip && tooltipName) {
           tooltipName.textContent = mesh.userData.name;
+
+          const satdetails = getTelemetryData(mesh.userData.satrec);
+          updateTooltip(satdetails);
           tooltip.classList.remove("hidden");
         }
       }
