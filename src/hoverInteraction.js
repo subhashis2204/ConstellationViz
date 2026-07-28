@@ -15,7 +15,7 @@ export function setupHover(renderer, camera, markersGroup) {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     // Follow mouse position for tooltip
-    if (tooltip && !tooltip.classList.contains("hidden")) {
+    if (tooltip) {
       tooltip.style.left = `${event.clientX + 12}px`;
       tooltip.style.top = `${event.clientY - 12}px`;
     }

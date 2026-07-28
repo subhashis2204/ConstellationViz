@@ -67,7 +67,7 @@ export function setupSatelliteHover(globe, camera, renderer) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    if (tooltip && !tooltip.classList.contains("hidden")) {
+    if (tooltip) {
       tooltip.style.left = `${event.clientX + 12}px`;
       tooltip.style.top = `${event.clientY - 12}px`;
     }
