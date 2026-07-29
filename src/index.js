@@ -11,13 +11,16 @@ import { rotation } from "./rotation.js";
 import { LaunchStationCard } from "./cardStructure.js";
 import { launchClickListener } from "./clickListener.js";
 import { equatorLine } from "./equatorLine.js";
+import { clearAllOrbitLines } from "./satelliteOrbit.js";
 import { setupSatelliteHover } from "./satelliteHover.js";
 import {
   liveSatelliteDataset,
   plotSatellites,
   parseTLEData,
-  updateSatellites, // <--- Import updateSatellites
+  updateSatellites,
+  getSimulationDate,
 } from "./satelliteLoader.js";
+import { setupSatelliteClick } from "./satelliteClick.js";
 import { gsap } from "gsap";
 
 const { scene, camera, renderer, orbitControl } = initScene();
@@ -185,16 +188,34 @@ async function satelliteDataLoader(datasetLabel) {
   });
 }
 
+const updateSatHover = setupSatelliteHover(globe, camera, renderer);
+const resetSatelliteOrbit = setupSatelliteClick(
+  globe,
+  camera,
+  renderer,
+  getSimulationDate,
+);
+
 datasetSelect.addEventListener("change", async (event) => {
   datasetLabel = event.target.value;
 
   datasetSatelliteCount.innerHTML = "Loading ...";
+
+  clearAllOrbitLines(globe);
+
   const dataset = await satelliteDataLoader(datasetLabel);
   datasetSatelliteCount.innerHTML = dataset.length || "--";
+
+  resetSatelliteOrbit();
   plotSatellites(globe, dataset);
 });
 
-const updateSatHover = setupSatelliteHover(globe, camera, renderer);
+const clearOrbitsBtn = document.querySelector("#clear-orbits-btn");
+if (clearOrbitsBtn) {
+  clearOrbitsBtn.addEventListener("click", () => {
+    clearAllOrbitLines(globe);
+  });
+}
 // --------------------------------------------------------------------
 
 const axisY = new THREE.Vector3(0, 1, 0);

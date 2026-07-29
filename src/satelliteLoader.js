@@ -91,6 +91,10 @@ export function plotSatellites(globe, satellites) {
 // Track virtual time
 let virtualTime = new Date().getTime();
 
+export function getSimulationDate() {
+  return new Date(virtualTime);
+}
+
 /**
  * Propagates satellite trajectories and updates custom layer mesh positions.
  */
