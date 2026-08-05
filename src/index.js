@@ -11,7 +11,10 @@ import { rotation } from "./rotation.js";
 import { LaunchStationCard } from "./cardStructure.js";
 import { launchClickListener } from "./clickListener.js";
 import { equatorLine } from "./equatorLine.js";
-import { clearAllOrbitLines } from "./satelliteOrbit.js";
+import {
+  clearAllOrbitLines,
+  updateActiveOrbitLines,
+} from "./satelliteOrbit.js";
 import { setupSatelliteHover } from "./satelliteHover.js";
 import {
   liveSatelliteDataset,
@@ -241,14 +244,17 @@ const ticker = () => {
   if (altitude !== getCameraAltitudeKm(camera)) {
     altitude = getCameraAltitudeKm(camera);
     cameraAlt.innerHTML = altitude;
-    console.log("test");
   }
 
   const delta = clock.getDelta(); // Frame time in seconds (~0.016s)
 
-  // Pass factor so satellite movement scales with your control UI!
-  if (activeMotionState && !isDragging) updateSatellites(globe, factor, delta);
-  else updateSatellites(globe, 0, delta);
+  if (activeMotionState && !isDragging) {
+    updateSatellites(globe, factor, delta);
+    // Keep active orbits attached & updated relative to current simulation date
+    updateActiveOrbitLines(globe, getSimulationDate());
+  } else {
+    updateSatellites(globe, 0, delta);
+  }
 
   // Update satellite hover check on every frame
   updateSatHover();
