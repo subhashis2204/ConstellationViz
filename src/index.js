@@ -236,6 +236,17 @@ const clock = new THREE.Clock();
 let altitude = getCameraAltitudeKm(camera);
 cameraAlt.innerHTML = getCameraAltitudeKm(camera);
 
+function updateCoverageCones(globe) {
+  const origin = new THREE.Vector3(0, 0, 0);
+
+  globe.traverse((child) => {
+    if (child.isMesh && child.name === "coverageCone") {
+      // Always point cone apex toward Earth's center (0,0,0)
+      child.lookAt(origin);
+    }
+  });
+}
+
 const ticker = () => {
   hover.update();
 
@@ -255,6 +266,9 @@ const ticker = () => {
   } else {
     updateSatellites(globe, 0, delta);
   }
+
+  // Ensure active coverage cones stay aligned toward Earth's center
+  updateCoverageCones(globe);
 
   // Update satellite hover check on every frame
   updateSatHover();
