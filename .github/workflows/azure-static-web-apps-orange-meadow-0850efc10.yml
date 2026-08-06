@@ -1,5 +1,4 @@
-# Workflow for deploying Vite static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy static content to Pages and Azure
 
 on:
   push:
@@ -17,9 +16,6 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,9 +30,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      # Build for Github
+
+      - name: Build for Github
+        env:
+          DEPLOY_TARGET: github
         run: npm run build
 
+      # --- SECTION 1: DEPLOY TO GITHUB PAGES ---
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
@@ -48,3 +49,19 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # --- SECTION 2: DEPLOY TO AZURE STATIC WEB APPS ---
+
+      - name: Build for Azure
+        env:
+          DEPLOY_TARGET: azure
+        run: npm run build
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "dist"
+          skip_app_build: true

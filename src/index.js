@@ -25,6 +25,8 @@ import {
 } from "./satelliteLoader.js";
 import { setupSatelliteClick } from "./satelliteClick.js";
 import { gsap } from "gsap";
+import earthTexture from "/earth.jpg";
+import earthCloudTexture from "/earth_cloud_lite.jpg";
 
 const { scene, camera, renderer, orbitControl } = initScene();
 console.log(camera.position.z);
@@ -35,9 +37,7 @@ orbitControl.enableRotate = false;
 const globeContainer = new THREE.Group();
 scene.add(globeContainer);
 
-const globe = new ThreeGlobe().globeImageUrl(
-  `${import.meta.env.BASE_URL}assets/earth.jpg`,
-);
+const globe = new ThreeGlobe().globeImageUrl(earthTexture);
 globeContainer.add(globe);
 
 const tilt = new THREE.Quaternion();
@@ -49,9 +49,7 @@ tilt.setFromAxisAngle(
 // globeContainer.quaternion.copy(tilt);
 
 const cloudGeometry = new THREE.SphereGeometry(101, 64, 64);
-const cloudTexture = new THREE.TextureLoader().load(
-  `${import.meta.env.BASE_URL}assets/earth_cloud_lite.jpg`,
-);
+const cloudTexture = new THREE.TextureLoader().load(earthCloudTexture);
 const cloudMaterial = new THREE.MeshStandardMaterial({
   map: cloudTexture,
   transparent: true,
