@@ -216,7 +216,7 @@ datasetSelect.addEventListener("change", async (event) => {
 const clearOrbitsBtn = document.querySelector("#clear-orbits-btn");
 if (clearOrbitsBtn) {
   clearOrbitsBtn.addEventListener("click", () => {
-    clearAllOrbitLines(globe);
+    resetSatelliteOrbit();
   });
 }
 // --------------------------------------------------------------------
