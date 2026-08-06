@@ -25,8 +25,8 @@ import {
 } from "./satelliteLoader.js";
 import { setupSatelliteClick } from "./satelliteClick.js";
 import { gsap } from "gsap";
-import earthTexture from "/earth.jpg";
-import earthCloudTexture from "/earth_cloud_lite.jpg";
+import earthTexture from "/earth.webp";
+import earthCloudTexture from "/earth_cloud_lite.webp";
 
 const { scene, camera, renderer, orbitControl } = initScene();
 console.log(camera.position.z);
